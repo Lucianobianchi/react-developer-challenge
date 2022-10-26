@@ -7,6 +7,7 @@ import {
 } from "../../services/CoinGecko/coins";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+import { MarketChartGraph } from "../../components/MarketChartGraph";
 
 const timeframes = ["1d", "1m", "6m", "1y", "5y"] as const;
 export type ChartTimeframes = typeof timeframes[number];
@@ -76,6 +77,10 @@ const CoinPage: NextPage<{ initialMarketChart: MarketChartResponse }> = ({
                     </ToggleButton>
                 ))}
             </ToggleButtonGroup>
+            <MarketChartGraph
+                marketCaps={marketChart.market_caps}
+                prices={marketChart.prices}
+            />
         </div>
     );
 };
