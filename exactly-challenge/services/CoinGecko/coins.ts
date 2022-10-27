@@ -43,6 +43,12 @@ export const getMarkets = async (page = 1, perPage = 20, currency = "usd") => {
     });
 };
 
+export const getMarket = async (coinId: string) => {
+    return axiosInstance.get<Market[]>(`/coins/${coinId}`, {
+        params: {},
+    });
+};
+
 // TODO: use object as parameter instead of positional ones
 export const getMarketChart = async (
     coinId: string,

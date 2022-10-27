@@ -30,20 +30,24 @@ ChartJS.register(
 export interface MarketChartGraphProps {
     marketCaps: MarketQuote[];
     prices: MarketQuote[];
+    selection: "price" | "market_cap";
 }
 export type MarketQuote = [Date, number];
 
 export const MarketChartGraph: React.FC<MarketChartGraphProps> = ({
     marketCaps,
     prices,
+    selection,
 }) => {
+    const stats = selection === "price" ? prices : marketCaps;
+
     const data = {
-        labels: prices.map((p) => new Date(p[0])),
+        labels: stats.map((p) => new Date(p[0])),
         datasets: [
             {
                 fill: true,
                 label: "USD$",
-                data: prices.map((p) => p[1]),
+                data: stats.map((p) => p[1]),
                 borderColor: "rgb(53, 162, 235)",
                 backgroundColor: "rgba(53, 162, 235, 0.5)",
             },

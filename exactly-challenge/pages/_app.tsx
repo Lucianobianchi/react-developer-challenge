@@ -1,16 +1,32 @@
 import "../styles/globals.css";
-import type { AppProps } from "next/app";
-import { CurrencyProvider } from "../providers/CurrencyProvider";
+import type { AppContext, AppProps } from "next/app";
+import {
+    Currency,
+    CurrencyProvider,
+    getCurrencyFromCookie,
+} from "../providers/CurrencyProvider";
 import { Layout } from "../components/layout/Layout";
+import App from "next/app";
 
-function MyApp({ Component, pageProps }: AppProps) {
+interface CustomAppProps extends AppProps {
+    currency: Currency;
+}
+
+const MyApp: any = ({ Component, pageProps, currency }: CustomAppProps) => {
     return (
-        <CurrencyProvider>
+        <CurrencyProvider initialValue={currency}>
             <Layout>
                 <Component {...pageProps} />
             </Layout>
         </CurrencyProvider>
     );
-}
+};
+
+MyApp.getInitialProps = async (appContext: AppContext) => {
+    const appProps = await App.getInitialProps(appContext);
+    const { ctx } = appContext;
+    const currency = getCurrencyFromCookie(ctx);
+    return { ...appProps, currency };
+};
 
 export default MyApp;
