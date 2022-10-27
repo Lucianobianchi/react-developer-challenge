@@ -1,12 +1,15 @@
 import { Stack } from "@mui/material";
-import type { NextPage } from "next";
+import type { NextPage, NextPageContext } from "next";
 import Head from "next/head";
+import { useEffect, useState } from "react";
 import { CoinListItem } from "../components/CoinListItem";
+import { CurrencySelector } from "../components/CurrencySelector";
+import { useCurrency } from "../providers/CurrencyProvider";
 import { getMarkets, Market } from "../services/CoinGecko/coins";
 import styles from "../styles/Home.module.css";
 
-export const getServerSideProps = async () => {
-    const markets = await getMarkets();
+export const getServerSideProps = async (context: NextPageContext) => {
+    const markets = await getMarkets(1 /* page */, 20 /* per page*/, "USD");
     return {
         props: {
             marketList: markets.data,
@@ -14,7 +17,18 @@ export const getServerSideProps = async () => {
     };
 };
 
-const Home: NextPage<{ marketList: Market[] }> = ({ marketList }) => {
+const Home: NextPage<{ marketList: Market[] }> = ({
+    marketList: initialMarketList,
+}) => {
+    const [marketList, setMarketList] = useState<Market[]>(initialMarketList);
+    const { currency } = useCurrency();
+
+    useEffect(() => {
+        getMarkets(1 /* page */, 20 /* per page*/, currency).then((res) => {
+            setMarketList(res.data);
+        });
+    }, [currency]);
+
     return (
         <div className={styles.container}>
             <Head>
@@ -22,16 +36,12 @@ const Home: NextPage<{ marketList: Market[] }> = ({ marketList }) => {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 
-            <main className={styles.main}>
-                <h1 className={styles.title}>Exactly Challenge</h1>
-                <Stack>
-                    {marketList.map((m) => (
-                        <CoinListItem market={m} />
-                    ))}
-                </Stack>
-            </main>
-
-            <footer className={styles.footer}></footer>
+            <h1 className={styles.title}>All markets</h1>
+            <Stack>
+                {marketList.map((m) => (
+                    <CoinListItem market={m} key={m.name} />
+                ))}
+            </Stack>
         </div>
     );
 };

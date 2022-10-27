@@ -8,6 +8,9 @@ import {
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import { MarketChartGraph } from "../../components/MarketChartGraph";
+import { Breadcrumbs } from "@mui/material";
+import { useCurrency } from "../../providers/CurrencyProvider";
+import Link from "next/link";
 
 const timeframes = ["1d", "1m", "6m", "1y", "5y"] as const;
 export type ChartTimeframes = typeof timeframes[number];
@@ -23,7 +26,7 @@ const timeframesToDaysAgo: { [tf in ChartTimeframes]: number } = {
 export const getServerSideProps = async (context: NextPageContext) => {
     const { coinId } = context.query;
 
-    const markets = await getMarketChart(coinId as any, 1);
+    const markets = await getMarketChart(coinId as any, 1, "USD");
     // TODO: error handling
     return {
         props: {
@@ -37,6 +40,7 @@ const CoinPage: NextPage<{ initialMarketChart: MarketChartResponse }> = ({
 }) => {
     const router = useRouter();
     const { coinId, tf = "1d" } = router.query;
+    const { currency } = useCurrency();
 
     const [chartTf, setChartTf] = useState<ChartTimeframes>(
         tf as ChartTimeframes
@@ -56,15 +60,23 @@ const CoinPage: NextPage<{ initialMarketChart: MarketChartResponse }> = ({
         useState<MarketChartResponse>(initialMarketChart);
 
     useEffect(() => {
-        getMarketChart(coinId as string, timeframesToDaysAgo[chartTf]).then(
-            (res) => setMarketChart(res.data)
-        );
-    }, [coinId, chartTf]);
-
-    console.log(marketChart);
+        getMarketChart(
+            coinId as string,
+            timeframesToDaysAgo[chartTf],
+            currency
+        ).then((res) => setMarketChart(res.data));
+    }, [coinId, chartTf, currency]);
 
     return (
         <div>
+            <Breadcrumbs aria-label="breadcrumb">
+                <Link color="inherit" href="/">
+                    All markets
+                </Link>
+                <Link color="inherit" href={`/coins/${coinId}`}>
+                    {coinId}
+                </Link>
+            </Breadcrumbs>
             <p>Coin: {coinId}</p>
             <ToggleButtonGroup
                 value={chartTf}

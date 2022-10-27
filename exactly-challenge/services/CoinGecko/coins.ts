@@ -19,6 +19,7 @@ export interface Market {
     total_volume: number;
     high_24h: number;
     low_24h: number;
+    price_change_percentage_24h: number;
 }
 
 export interface MarketChartResponse {
