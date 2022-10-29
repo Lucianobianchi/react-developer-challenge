@@ -56,6 +56,7 @@ interface CoinPageProps {
     coinInfo: CoinInfo;
 }
 
+// TODO: add loading indicator
 const CoinPage: NextPage<CoinPageProps> = ({
     initialMarketChart,
     coinInfo,

@@ -27,6 +27,7 @@ ChartJS.register(
     TimeSeriesScale
 );
 
+// TODO: decouple component props from coinGecko service types
 export interface MarketChartGraphProps {
     marketCaps: MarketQuote[];
     prices: MarketQuote[];

@@ -12,6 +12,7 @@ interface CustomAppProps extends AppProps {
     currency: Currency;
 }
 
+// TODO add transition and loading between pages
 const MyApp: any = ({ Component, pageProps, currency }: CustomAppProps) => {
     return (
         <CurrencyProvider initialValue={currency}>
