@@ -32,7 +32,7 @@ export interface MarketChartGraphProps {
     prices: MarketQuote[];
     selection: "price" | "market_cap";
 }
-export type MarketQuote = [Date, number];
+export type MarketQuote = [number, number];
 
 export const MarketChartGraph: React.FC<MarketChartGraphProps> = ({
     marketCaps,
@@ -46,7 +46,6 @@ export const MarketChartGraph: React.FC<MarketChartGraphProps> = ({
         datasets: [
             {
                 fill: true,
-                label: "USD$",
                 data: stats.map((p) => p[1]),
                 borderColor: "rgb(53, 162, 235)",
                 backgroundColor: "rgba(53, 162, 235, 0.5)",
@@ -55,25 +54,18 @@ export const MarketChartGraph: React.FC<MarketChartGraphProps> = ({
     };
 
     const options = {
-        responsive: true,
         plugins: {},
         scales: {
             x: {
+                type: "time" as "time",
                 adapters: {
-                    date: { locale: enGB },
-                    type: "time",
-                    distribution: "linear",
-                    time: {
-                        unit: "day",
-                    },
-                    title: {
-                        display: true,
-                        text: "Date",
+                    date: {
+                        locale: enGB,
                     },
                 },
             },
         },
     };
 
-    return <Line options={options} data={data} />;
+    return <Line data={data} options={options} />;
 };

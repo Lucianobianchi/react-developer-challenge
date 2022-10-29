@@ -28,7 +28,19 @@ export interface MarketChartResponse {
     total_volumes: MarketQuote[];
 }
 
-export type MarketQuote = [Date, number];
+export type MarketQuote = [number, number];
+
+export interface CoinInfo {
+    id: string;
+    symbol: string;
+    name: string;
+    image: string;
+    market_data: {
+        current_price: { [key: string]: number };
+        total_supply: number;
+        total_volume: { [key: string]: number };
+    };
+}
 
 // TODO: use object as parameter instead of positional ones
 export const getMarkets = async (page = 1, perPage = 20, currency = "usd") => {
@@ -44,8 +56,10 @@ export const getMarkets = async (page = 1, perPage = 20, currency = "usd") => {
 };
 
 export const getMarket = async (coinId: string) => {
-    return axiosInstance.get<Market[]>(`/coins/${coinId}`, {
-        params: {},
+    return axiosInstance.get<CoinInfo>(`/coins/${coinId}`, {
+        params: {
+            vs_currency: "usd",
+        },
     });
 };
 

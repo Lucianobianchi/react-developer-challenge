@@ -3,8 +3,10 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
+    CoinInfo,
     getMarket,
     getMarketChart,
+    Market,
     MarketChartResponse,
 } from "../../services/CoinGecko/coins";
 import ToggleButton from "@mui/material/ToggleButton";
@@ -15,6 +17,7 @@ import {
     getCurrencyFromCookie,
     useCurrency,
 } from "../../providers/CurrencyProvider";
+import { CoinInfoPanel } from "../../components/CoinInfoPanel/CoinInfoPanel";
 
 const timeframes = ["1d", "1m", "6m", "1y", "5y"] as const;
 export type ChartTimeframes = typeof timeframes[number];
@@ -32,23 +35,36 @@ const timeframesToDaysAgo: { [tf in ChartTimeframes]: number } = {
 export const getServerSideProps = async (context: NextPageContext) => {
     const { coinId } = context.query;
     const currency = getCurrencyFromCookie(context);
-    const markets = await getMarketChart(coinId as any, 1, currency);
-    const coinInfo = await getMarket(coinId as any);
-    console.log(coinInfo);
-    // TODO: error handling
+    const marketsPromise = getMarketChart(coinId as any, 1, currency);
+    const coinInfoPromise = getMarket(coinId as any);
+
+    const [markets, coinInfo] = await Promise.all([
+        marketsPromise,
+        coinInfoPromise,
+    ]);
+
     return {
         props: {
             initialMarketChart: markets.data,
+            coinInfo: coinInfo.data,
         },
     };
 };
 
-const CoinPage: NextPage<{ initialMarketChart: MarketChartResponse }> = ({
+interface CoinPageProps {
+    initialMarketChart: MarketChartResponse;
+    coinInfo: CoinInfo;
+}
+
+const CoinPage: NextPage<CoinPageProps> = ({
     initialMarketChart,
+    coinInfo,
 }) => {
     const router = useRouter();
     const { coinId, tf = "1d" } = router.query;
     const { currency } = useCurrency();
+
+    console.log(coinInfo);
 
     const [chartTf, setChartTf] = useState<ChartTimeframes>(
         tf as ChartTimeframes
@@ -56,8 +72,6 @@ const CoinPage: NextPage<{ initialMarketChart: MarketChartResponse }> = ({
     const [marketStat, setMarketStat] = useState<MarketStats>("price");
     const [marketChart, setMarketChart] =
         useState<MarketChartResponse>(initialMarketChart);
-
-    console.log(marketChart);
 
     const handleAlignment = (
         event: React.MouseEvent<HTMLElement>,
@@ -94,13 +108,18 @@ const CoinPage: NextPage<{ initialMarketChart: MarketChartResponse }> = ({
                     All markets
                 </Link>
                 <Link color="inherit" href={`/coins/${coinId}`}>
-                    {coinId}
+                    {coinInfo.name}
                 </Link>
             </Breadcrumbs>
 
+            <h1>{coinInfo.name}</h1>
+            <h2>{`$${coinInfo.market_data.current_price[
+                currency.toLowerCase()
+            ].toLocaleString()}`}</h2>
+
             <Grid container spacing={1}>
                 <Grid item xs={12} md={8}>
-                    <Stack>
+                    <Stack spacing={4}>
                         <Stack direction="row" justifyContent="space-between">
                             <ToggleButtonGroup
                                 value={marketStat}
@@ -137,7 +156,7 @@ const CoinPage: NextPage<{ initialMarketChart: MarketChartResponse }> = ({
                     </Stack>
                 </Grid>
                 <Grid item xs={12} md={4}>
-                    <p>some info</p>
+                    <CoinInfoPanel {...coinInfo} />
                 </Grid>
             </Grid>
         </div>

@@ -22,6 +22,7 @@ export const CurrencySelector: React.FC = () => {
             <Select
                 labelId="currency-select-label"
                 id="currency-select"
+                aria-label="Select currency"
                 value={currency}
                 onChange={handleChange}
             >

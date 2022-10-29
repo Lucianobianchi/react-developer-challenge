@@ -2,8 +2,10 @@ import { Stack } from "@mui/material";
 import type { NextPage, NextPageContext } from "next";
 import Head from "next/head";
 import { useEffect, useState } from "react";
-import { CoinListHeaderItem, CoinListItem } from "../components/CoinListItem";
-import { CurrencySelector } from "../components/CurrencySelector";
+import {
+    CoinListHeaderItem,
+    CoinListItem,
+} from "../components/CoinListItem/CoinListItem";
 import {
     getCurrencyFromCookie,
     useCurrency,

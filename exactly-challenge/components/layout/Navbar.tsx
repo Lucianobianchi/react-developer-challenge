@@ -11,13 +11,13 @@ import { CurrencySelector } from "../CurrencySelector";
 
 export const Navbar = () => {
     return (
-        <AppBar position="sticky">
+        <AppBar position="relative">
             <Container maxWidth="xl">
                 <Toolbar disableGutters={true}>
                     <Typography variant="h6" sx={{ flexGrow: 1 }}>
                         <Link href="/">Exactly Challenge</Link>
                     </Typography>
-                    <div>
+                    <div style={{ padding: "8px" }}>
                         <CurrencySelector />
                     </div>
                 </Toolbar>
