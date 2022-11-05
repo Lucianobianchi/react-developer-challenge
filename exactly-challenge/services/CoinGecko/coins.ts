@@ -1,49 +1,20 @@
 import axios from "axios";
-
-// TODO: add to a config file
-const COIN_GECKO_API = "https://api.coingecko.com/api/v3";
+import { CoinInfo, Market, MarketChartResponse } from "./types";
 
 const axiosInstance = axios.create({
-    baseURL: COIN_GECKO_API,
+    baseURL: process.env.NEXT_PUBLIC_COINGECKO_API_URL,
 });
 
-export interface Market {
-    id: string;
-    symbol: string;
-    name: string;
-    image: string;
-    current_price: number;
-    market_cap: number;
-    market_cap_rank: number;
-    fully_diluted_valuation: number;
-    total_volume: number;
-    high_24h: number;
-    low_24h: number;
-    price_change_percentage_24h: number;
+interface GetMarketOptions {
+    page?: number;
+    perPage?: number;
+    currency?: string;
 }
-
-export interface MarketChartResponse {
-    market_caps: MarketQuote[];
-    prices: MarketQuote[];
-    total_volumes: MarketQuote[];
-}
-
-export type MarketQuote = [number, number];
-
-export interface CoinInfo {
-    id: string;
-    symbol: string;
-    name: string;
-    image: string;
-    market_data: {
-        current_price: { [key: string]: number };
-        total_supply: number;
-        total_volume: { [key: string]: number };
-    };
-}
-
-// TODO: use object as parameter instead of positional ones
-export const getMarkets = async (page = 1, perPage = 20, currency = "usd") => {
+export const getMarkets = async ({
+    page = 1,
+    perPage = 20,
+    currency = "usd",
+}: GetMarketOptions) => {
     return axiosInstance.get<Market[]>("/coins/markets", {
         params: {
             vs_currency: currency,
@@ -63,12 +34,17 @@ export const getMarket = async (coinId: string) => {
     });
 };
 
-// TODO: use object as parameter instead of positional ones
-export const getMarketChart = async (
-    coinId: string,
-    fromDaysAgo: number,
-    currency = "usd"
-) => {
+interface GetMarketChartOptions {
+    coinId: string;
+    fromDaysAgo: number;
+    currency?: string;
+}
+
+export const getMarketChart = async ({
+    coinId,
+    fromDaysAgo,
+    currency = "usd",
+}: GetMarketChartOptions) => {
     if (fromDaysAgo < 0) {
         throw new Error(
             `fromDaysAgo must be positive. Received ${fromDaysAgo}`

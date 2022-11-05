@@ -1,6 +1,5 @@
 import {
     FormControl,
-    InputLabel,
     MenuItem,
     Select,
     SelectChangeEvent,
@@ -13,7 +12,7 @@ import {
 
 export const CurrencySelector: React.FC = () => {
     const { currency, updateCurrency } = useCurrency();
-    const handleChange = (e: SelectChangeEvent<"USD" | "EUR" | "ARS">) => {
+    const handleChange = (e: SelectChangeEvent<Currency>) => {
         updateCurrency(e.target.value as Currency);
     };
 

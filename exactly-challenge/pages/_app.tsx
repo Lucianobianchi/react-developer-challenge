@@ -8,12 +8,11 @@ import {
 import { Layout } from "../components/layout/Layout";
 import App from "next/app";
 
-interface CustomAppProps extends AppProps {
+interface MyAppProps extends AppProps {
     currency: Currency;
 }
 
-// TODO add transition and loading between pages
-const MyApp: any = ({ Component, pageProps, currency }: CustomAppProps) => {
+const MyApp: any = ({ Component, pageProps, currency }: MyAppProps) => {
     return (
         <CurrencyProvider initialValue={currency}>
             <Layout>

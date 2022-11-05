@@ -10,12 +10,18 @@ import {
     getCurrencyFromCookie,
     useCurrency,
 } from "../providers/CurrencyProvider";
-import { getMarkets, Market } from "../services/CoinGecko/coins";
+import { Market } from "../services/CoinGecko";
+import { getMarkets } from "../services/CoinGecko/coins";
 import styles from "../styles/Home.module.css";
 
 export const getServerSideProps = async (context: NextPageContext) => {
     const currency = getCurrencyFromCookie(context);
-    const markets = await getMarkets(1 /* page */, 20 /* per page*/, currency);
+    const markets = await getMarkets({
+        page: 1,
+        perPage: 20,
+        currency,
+    });
+
     return {
         props: {
             marketList: markets.data,
@@ -30,7 +36,11 @@ const Home: NextPage<{ marketList: Market[] }> = ({
     const { currency } = useCurrency();
 
     useEffect(() => {
-        getMarkets(1 /* page */, 20 /* per page*/, currency).then((res) => {
+        getMarkets({
+            page: 1,
+            perPage: 20,
+            currency,
+        }).then((res) => {
             setMarketList(res.data);
         });
     }, [currency]);

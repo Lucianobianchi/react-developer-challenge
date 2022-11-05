@@ -2,13 +2,8 @@ import { NextPage, NextPageContext } from "next";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import {
-    CoinInfo,
-    getMarket,
-    getMarketChart,
-    Market,
-    MarketChartResponse,
-} from "../../services/CoinGecko/coins";
+import { getMarket, getMarketChart } from "../../services/CoinGecko/coins";
+import { CoinInfo, MarketChartResponse } from "../../services/CoinGecko";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import { MarketChartGraph } from "../../components/MarketChartGraph";
@@ -18,6 +13,7 @@ import {
     useCurrency,
 } from "../../providers/CurrencyProvider";
 import { CoinInfoPanel } from "../../components/CoinInfoPanel/CoinInfoPanel";
+import Head from "next/head";
 
 const timeframes = ["1d", "1m", "6m", "1y", "5y"] as const;
 export type ChartTimeframes = typeof timeframes[number];
@@ -33,10 +29,14 @@ const timeframesToDaysAgo: { [tf in ChartTimeframes]: number } = {
 };
 
 export const getServerSideProps = async (context: NextPageContext) => {
-    const { coinId } = context.query;
+    const coinId = context.query.coinId as string;
     const currency = getCurrencyFromCookie(context);
-    const marketsPromise = getMarketChart(coinId as any, 1, currency);
-    const coinInfoPromise = getMarket(coinId as any);
+    const marketsPromise = getMarketChart({
+        coinId: coinId,
+        fromDaysAgo: 1,
+        currency,
+    });
+    const coinInfoPromise = getMarket(coinId);
 
     const [markets, coinInfo] = await Promise.all([
         marketsPromise,
@@ -56,17 +56,14 @@ interface CoinPageProps {
     coinInfo: CoinInfo;
 }
 
-// TODO: add loading indicator
 const CoinPage: NextPage<CoinPageProps> = ({
     initialMarketChart,
     coinInfo,
 }) => {
     const router = useRouter();
-    const { coinId, tf = "1d" } = router.query;
+    const tf = (router.query.tf || "1d") as string;
+    const coinId = router.query.coinId as string;
     const { currency } = useCurrency();
-
-    console.log(coinInfo);
-
     const [chartTf, setChartTf] = useState<ChartTimeframes>(
         tf as ChartTimeframes
     );
@@ -95,15 +92,20 @@ const CoinPage: NextPage<CoinPageProps> = ({
     };
 
     useEffect(() => {
-        getMarketChart(
-            coinId as string,
-            timeframesToDaysAgo[chartTf],
-            currency
-        ).then((res) => setMarketChart(res.data));
+        getMarketChart({
+            coinId,
+            fromDaysAgo: timeframesToDaysAgo[chartTf],
+            currency,
+        }).then((res) => setMarketChart(res.data));
     }, [coinId, chartTf, currency]);
 
     return (
         <div>
+            <Head>
+                <title>{`Exactly Challenge | ${coinInfo.name}`}</title>
+                <link rel="icon" href="/favicon.ico" />
+            </Head>
+
             <Breadcrumbs aria-label="breadcrumb">
                 <Link color="inherit" href="/">
                     All markets

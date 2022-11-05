@@ -27,13 +27,13 @@ ChartJS.register(
     TimeSeriesScale
 );
 
-// TODO: decouple component props from coinGecko service types
+type MarketQuote = [number, number];
+
 export interface MarketChartGraphProps {
     marketCaps: MarketQuote[];
     prices: MarketQuote[];
     selection: "price" | "market_cap";
 }
-export type MarketQuote = [number, number];
 
 export const MarketChartGraph: React.FC<MarketChartGraphProps> = ({
     marketCaps,
