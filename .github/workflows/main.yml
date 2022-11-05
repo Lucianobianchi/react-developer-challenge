@@ -9,10 +9,15 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v2
 
+            - name: Install dependencies
+              run: |
+                  cd ./exactly-challenge
+                  npm ci
+
             - name: Cypress run
               uses: cypress-io/github-action@v3
               with:
-                  working-directory: ./exactly-challenge
+                  working-directory: exactly-challenge
                   browser: chrome
                   build: npm run build
                   start: npm run start

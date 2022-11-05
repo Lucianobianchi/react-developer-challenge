@@ -39,3 +39,5 @@ describe("Coin page", () => {
         cy.url().should("include", "/");
     });
 });
+
+export {};
